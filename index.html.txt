@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="cs">
 <head>
     <meta charset="UTF-8">
@@ -103,7 +103,7 @@
         </div>
     </div>
     <script>
-        const apiKey = 'TVŮJ_ALPHA_VANTAGE_API_KLÍČ';
+        const apiKey = '3D7G4UEDZH3ZVT7X';
         const symbol = 'GBPUSD';
         
         async function getForexData() {
