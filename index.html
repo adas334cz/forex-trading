@@ -4,7 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Forex Trading</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-tickers.js" async>
+    {
+        "symbols": [
+            {
+                "title": "GBP/USD",
+                "proName": "FX:GBPUSD"
+            }
+        ],
+        "colorTheme": "light",
+        "isTransparent": false,
+        "locale": "cs"
+    }
+    </script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -17,99 +29,46 @@
             padding: 10px 0;
             text-align: center;
         }
-        canvas {
-            display: block;
-            margin: auto;
-        }
-        .predictions {
-            margin: 20px auto;
+        .currency-selector {
             text-align: center;
+            margin-top: 20px;
         }
-        .sell {
-            color: red;
-        }
-        .buy {
-            color: green;
+        .currency-selector button {
+            margin: 5px;
+            padding: 8px 16px;
+            background-color: #333;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            border-radius: 4px;
         }
     </style>
 </head>
 <body>
     <header>
-        <h1>Live Forex Trading</h1>
+        <h1>Forex Trading</h1>
     </header>
-    <canvas id="forexChart" width="800" height="400"></canvas>
-    <div class="predictions" id="predictions">
-        <h2>Predictions</h2>
+    <!-- TradingView Widget pro zobrazení interaktivního grafu -->
+    <div class="tradingview-widget-container">
+        <div class="tradingview-widget-container__widget"></div>
+    </div>
+
+    <!-- Tlačítka pro přepínání měnových párů -->
+    <div class="currency-selector">
+        <button onclick="changeSymbol('FX:GBPUSD')">GBP/USD</button>
+        <button onclick="changeSymbol('FX:EURUSD')">EUR/USD</button>
+        <button onclick="changeSymbol('FX:USDJPY')">USD/JPY</button>
+        <!-- Další tlačítka pro další měnové páry -->
     </div>
 
     <script>
-        const ctx = document.getElementById('forexChart').getContext('2d');
-        const forexChart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: [],
-                datasets: [{
-                    label: 'GBP/USD',
-                    data: [],
-                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                    borderColor: 'rgba(255, 99, 132, 1)',
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                scales: {
-                    xAxes: [{
-                        display: false
-                    }]
-                }
+        // Funkce pro změnu zobrazeného měnového páru v TradingView widgetu
+        function changeSymbol(symbol) {
+            var widget = window.tvWidget && window.tvWidget.activeChart();
+            if (widget) {
+                widget.chart().setSymbol(symbol, { interval: 'D' });
             }
-        });
-
-        // API klíče
-        const apiKeyAlphaVantage = 'QRRX5QLI6T3TIMKI';
-        const apiKeyFinnhub = 'cpgtk4hr01qpm8ao6hr0cpgtk4hr01qpm8ao6hrg';
-
-        // Funkce pro získání finančních dat pomocí API Alpha Vantage
-        async function getFinancialDataAlphaVantage(symbol) {
-            const url = `https://www.alphavantage.co/query?function=TIME_SERIES_MONTHLY&symbol=${symbol}&apikey=${apiKeyAlphaVantage}`;
-            const response = await fetch(url);
-            const data = await response.json();
-            return data;
         }
-
-        // Funkce pro získání finančních dat pomocí API Finnhub
-        async function getFinancialDataFinnhub(symbol) {
-            const url = `https://finnhub.io/api/v1/stock/metric?symbol=${symbol}&metric=all&token=${apiKeyFinnhub}`;
-            const response = await fetch(url);
-            const data = await response.json();
-            return data;
-        }
-
-        // Funkce pro vyhodnocení predikcí
-        async function evaluatePredictions(symbol) {
-            const dataAlphaVantage = await getFinancialDataAlphaVantage(symbol);
-            const dataFinnhub = await getFinancialDataFinnhub(symbol);
-            
-            // Zde můžeš analyzovat historická data a generovat predikce pro různé strategie
-            // Například zde můžeš vyhodnocovat nejlepší pozice k nákupu a prodeji
-            const sellEntry = ''; // Místo vstupu pro prodej
-            const sellExit = ''; // Místo výstupu pro prodej
-            const buyEntry = ''; // Místo vstupu pro nákup
-            const buyExit = ''; // Místo výstupu pro nákup
-
-            // Vypisování predikcí
-            const predictionsElement = document.getElementById('predictions');
-            predictionsElement.innerHTML = `
-                <h2>Predictions</h2>
-                <p class="sell">Sell: Entry at ${sellEntry}, Exit at ${sellExit}</p>
-                <p class="buy">Buy: Entry at ${buyEntry}, Exit at ${buyExit}</p>
-            `;
-        }
-
-        // Spusť aktualizaci predikcí každých 5 minut
-        setInterval(() => {
-            evaluatePredictions('GBPUSD'); // Symbol GBP/USD
-        }, 5 * 60 * 1000); // 5 minut v milisekundách
     </script>
 </body>
 </html>
