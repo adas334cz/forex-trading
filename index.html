@@ -42,11 +42,21 @@
             cursor: pointer;
             border-radius: 4px;
         }
+        .predictions {
+            margin-top: 20px;
+            text-align: center;
+        }
+        .sell {
+            color: red;
+        }
+        .buy {
+            color: green;
+        }
     </style>
 </head>
 <body>
     <header>
-        <h1>Forex Trading</h1>
+        <h1><strong>Forex</strong> Trading</h1>
     </header>
     <!-- TradingView Widget pro zobrazení interaktivního grafu -->
     <div class="tradingview-widget-container">
@@ -61,12 +71,71 @@
         <!-- Další tlačítka pro další měnové páry -->
     </div>
 
+    <!-- Predikce -->
+    <div class="predictions" id="predictions">
+        <h2>Predictions</h2>
+    </div>
+
     <script>
-        // Funkce pro změnu zobrazeného měnového páru v TradingView widgetu
+        // API klíče
+        const apiKeyAlphaVantage = 'QRRX5QLI6T3TIMKI';
+        const apiKeyFinnhub = 'cpgtk4hr01qpm8ao6hr0cpgtk4hr01qpm8ao6hrg';
+
+        // Funkce pro získání finančních dat pomocí API Alpha Vantage
+        async function getFinancialDataAlphaVantage(symbol) {
+            const url = `https://www.alphavantage.co/query?function=TIME_SERIES_MONTHLY&symbol=${symbol}&apikey=${apiKeyAlphaVantage}`;
+            const response = await fetch(url);
+            const data = await response.json();
+            return data;
+        }
+
+        // Funkce pro získání finančních dat pomocí API Finnhub
+        async function getFinancialDataFinnhub(symbol) {
+            const url = `https://finnhub.io/api/v1/stock/metric?symbol=${symbol}&metric=all&token=${apiKeyFinnhub}`;
+            const response = await fetch(url);
+            const data = await response.json();
+            return data;
+        }
+
+        // Funkce pro získání RSI (Relative Strength Index)
+        async function getRSI(symbol) {
+            // Získání RSI z API nebo výpočet na základě historických dat
+            // Zde je pouze zjednodušený příklad
+            const financialData = await getFinancialDataAlphaVantage(symbol);
+            const rsi = calculateRSI(financialData);
+            return rsi;
+        }
+
+        // Funkce pro vyhodnocení strategie scalpingu
+        async function evaluateScalpingStrategy(symbol) {
+            // Zde implementujte strategii scalpingu pomocí dostupných dat
+            // Například analýza cenových pohybů nebo použití technických indikátorů
+            const rsiData = await getRSI(symbol);
+            const currentRSI = rsiData[0]; // Aktuální hodnota RSI
+            const previousRSI = rsiData[1]; // Hodnota RSI v předchozím období
+            const currentPrice = getCurrentPrice(symbol); // Aktuální cena
+            const previousPrice = getPreviousPrice(symbol); // Cena v předchozím období
+
+            let action = ''; // Akce, kterou se má provést (Buy/Sell)
+            let message = ''; // Zpráva s informacemi o obchodu
+
+            // Implementace scalpingové strategie zde
+
+            // Zobrazení obchodního signálu
+            const predictionsElement = document.getElementById('predictions');
+            predictionsElement.innerHTML = `
+                <h2>Scalping Strategy</h2>
+                <p>Action: ${action}</p>
+                <p>${message}</p>
+            `;
+        }
+
+        // Funkce pro změnu měnového páru v TradingView widgetu
         function changeSymbol(symbol) {
             var widget = window.tvWidget && window.tvWidget.activeChart();
             if (widget) {
                 widget.chart().setSymbol(symbol, { interval: 'D' });
+                evaluateScalpingStrategy(symbol);
             }
         }
     </script>
