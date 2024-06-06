@@ -4,19 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Forex Trading</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@700&display=swap');
-        
         body {
-            font-family: 'Roboto', sans-serif;
+            font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #f4f4f4;
-            color: #333; /* Černá barva pro text v normálním režimu */
-        }
-        body.night-mode {
-            background-color: #222; /* Černé pozadí pro night režim */
-            color: #fff; /* Bílá barva pro text v night režimu */
         }
         header {
             background-color: #333;
@@ -24,157 +17,99 @@
             padding: 10px 0;
             text-align: center;
         }
-        nav {
-            display: flex;
-            justify-content: center;
-            background-color: #444;
+        canvas {
+            display: block;
+            margin: auto;
         }
-        nav a {
-            color: #fff;
-            padding: 14px 20px;
-            text-decoration: none;
+        .predictions {
+            margin: 20px auto;
             text-align: center;
-            cursor: pointer; /* Přidá kurzor ukazující na odkaz */
         }
-        nav a:hover {
-            background-color: #555;
+        .sell {
+            color: red;
         }
-        .container {
-            padding: 20px;
-        }
-        .section {
-            margin: 20px 0;
-        }
-        .section h2 {
-            font-size: 24px;
-            margin-bottom: 10px;
-        }
-        .section p {
-            font-size: 18px;
-        }
-        .alert {
-            background-color: #ffdddd;
-            border-left: 6px solid #f44336;
-            margin-bottom: 15px;
-            padding: 15px;
-        }
-        .tradingview-widget-container {
-            width: 100%;
-            height: 600px;
-        }
-        .footer {
-            text-align: center;
-            padding: 20px;
-            background-color: #333;
-            color: #fff;
-        }
-        .footer a {
-            color: #fff;
-            text-decoration: none;
-        }
-        .footer a:hover {
-            text-decoration: underline;
+        .buy {
+            color: green;
         }
     </style>
 </head>
 <body>
     <header>
-        <h1>Forex Trading</h1>
+        <h1>Live Forex Trading</h1>
     </header>
-    <nav>
-        <a onclick="scrollToSection('charts')">Grafy</a>
-        <a onclick="scrollToSection('scalping')">Predikce pro Scalping</a>
-        <a onclick="scrollToSection('daytrading')">Predikce pro Daytrading</a>
-        <a onclick="scrollToSection('stocks')">Akcie</a>
-    </nav>
-    <div class="container">
-        <div id="charts" class="section">
-            <h2>Grafy</h2>
-            <p>Zde budou živé grafy forexu pro měny GBP/USD, USD/EUR, EUR/JPY.</p>
-            <div class="tradingview-widget-container">
-                <div id="tradingview_12345"></div>
-                <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
-                <script type="text/javascript">
-                    new TradingView.widget(
-                    {
-                        "width": 980,
-                        "height": 600,
-                        "symbol": "FX:GBPUSD",
-                        "interval": "D",
-                        "timezone": "Etc/UTC",
-                        "theme": "light",
-                        "style": "1",
-                        "locale": "cs",
-                        "toolbar_bg": "#f1f3f6",
-                        "enable_publishing": false,
-                        "allow_symbol_change": true,
-                        "container_id": "tradingview_12345"
-                    }
-                    );
-                </script>
-            </div>
-        </div>
-        <div id="scalping" class="section">
-            <h2>Predikce pro Scalping</h2>
-            <div class="alert">
-                <p id="scalping_recommendation"><strong>Doporučení:</strong> Načítání dat...</p>
-            </div>
-        </div>
-        <div id="daytrading" class="section">
-            <h2>Predikce pro Daytrading</h2>
-            <div class="alert">
-                <p id="daytrading_recommendation"><strong>Doporučení:</strong> Načítání dat...</p>
-            </div>
-        </div>
-        <div id="stocks" class="section">
-            <h2>Akcie</h2>
-            <p>Zde budou informace o akciích jako Tesla, GameStop, Nvidia.</p>
-        </div>
+    <canvas id="forexChart" width="800" height="400"></canvas>
+    <div class="predictions" id="predictions">
+        <h2>Predictions</h2>
     </div>
-    <footer class="footer">
-        <p><a href="#" target="_blank">Odkaz na moji stránku</a></p>
-    </footer>
+
     <script>
-        const apiKey = 'QRRX5QLI6T3TIMKI';
-        const forexSymbols = ['GBPUSD', 'USDEUR', 'EURJPY'];
-        const scalpingSymbol = 'SCALPING';
-        const daytradingSymbol = 'DAYTRADING';
-        
-        async function getForexData(symbol) {
-            const url = `https://www.alphavantage.co/query?function=CURRENCY_EXCHANGE_RATE&from_currency=${symbol.substring(0,3)}&to_currency=${symbol.substring(3)}&apikey=${apiKey}`;
+        const ctx = document.getElementById('forexChart').getContext('2d');
+        const forexChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: [],
+                datasets: [{
+                    label: 'GBP/USD',
+                    data: [],
+                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    xAxes: [{
+                        display: false
+                    }]
+                }
+            }
+        });
+
+        // API klíče
+        const apiKeyAlphaVantage = 'QRRX5QLI6T3TIMKI';
+        const apiKeyFinnhub = 'cpgtk4hr01qpm8ao6hr0cpgtk4hr01qpm8ao6hrg';
+
+        // Funkce pro získání finančních dat pomocí API Alpha Vantage
+        async function getFinancialDataAlphaVantage(symbol) {
+            const url = `https://www.alphavantage.co/query?function=TIME_SERIES_MONTHLY&symbol=${symbol}&apikey=${apiKeyAlphaVantage}`;
             const response = await fetch(url);
             const data = await response.json();
             return data;
         }
 
-        async function updateRecommendation(symbol) {
-            const data = await getForexData(symbol);
-            const rate = data['Realtime Currency Exchange Rate']['5. Exchange Rate'];
-            let recommendationElement;
-            let recommendation;
-            if (symbol === scalpingSymbol) {
-                recommendationElement = document.getElementById('scalping_recommendation');
-                recommendation = `Aktuální kurz pro Scalping je ${rate}. Doporučujeme koupit a držet po dobu 15 minut.`;
-            } else if (symbol === daytradingSymbol) {
-                recommendationElement = document.getElementById('daytrading_recommendation');
-                recommendation = `Aktuální kurz pro Daytrading je ${rate}. Doporučujeme koupit a držet po dobu 1 hodiny.`;
-            } else {
-                recommendationElement = document.getElementById('daytrading_recommendation');
-                recommendation = `Aktuální kurz ${symbol.substring(0,3)}/${symbol.substring(3)} je ${rate}. Doporučujeme koupit a držet po dobu 3 dnů.`;
-            }
-            recommendationElement.textContent = `Doporučení: ${recommendation}`;
+        // Funkce pro získání finančních dat pomocí API Finnhub
+        async function getFinancialDataFinnhub(symbol) {
+            const url = `https://finnhub.io/api/v1/stock/metric?symbol=${symbol}&metric=all&token=${apiKeyFinnhub}`;
+            const response = await fetch(url);
+            const data = await response.json();
+            return data;
         }
 
-        // Načtení dat a aktualizace doporučení pro scalping a daytrading
-        updateRecommendation(scalpingSymbol);
-        updateRecommendation(daytradingSymbol);
-        forexSymbols.forEach(symbol => updateRecommendation(symbol));
+        // Funkce pro vyhodnocení predikcí
+        async function evaluatePredictions(symbol) {
+            const dataAlphaVantage = await getFinancialDataAlphaVantage(symbol);
+            const dataFinnhub = await getFinancialDataFinnhub(symbol);
+            
+            // Zde můžeš analyzovat historická data a generovat predikce pro různé strategie
+            // Například zde můžeš vyhodnocovat nejlepší pozice k nákupu a prodeji
+            const sellEntry = ''; // Místo vstupu pro prodej
+            const sellExit = ''; // Místo výstupu pro prodej
+            const buyEntry = ''; // Místo vstupu pro nákup
+            const buyExit = ''; // Místo výstupu pro nákup
 
-        // Plynulé posouvání k sekci
-        function scrollToSection(sectionId) {
-            const section = document.getElementById(sectionId);
-            section.scrollIntoView({ behavior: 'smooth' });
+            // Vypisování predikcí
+            const predictionsElement = document.getElementById('predictions');
+            predictionsElement.innerHTML = `
+                <h2>Predictions</h2>
+                <p class="sell">Sell: Entry at ${sellEntry}, Exit at ${sellExit}</p>
+                <p class="buy">Buy: Entry at ${buyEntry}, Exit at ${buyExit}</p>
+            `;
         }
+
+        // Spusť aktualizaci predikcí každých 5 minut
+        setInterval(() => {
+            evaluatePredictions('GBPUSD'); // Symbol GBP/USD
+        }, 5 * 60 * 1000); // 5 minut v milisekundách
     </script>
 </body>
 </html>
