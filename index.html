@@ -34,6 +34,7 @@
             padding: 14px 20px;
             text-decoration: none;
             text-align: center;
+            cursor: pointer; /* Přidá kurzor ukazující na odkaz */
         }
         nav a:hover {
             background-color: #555;
@@ -81,14 +82,15 @@
         <h1>Forex Trading</h1>
     </header>
     <nav>
-        <a href="#charts">Grafy</a>
-        <a href="#predictions">Predikce</a>
-        <a href="#stocks">Akcie</a>
+        <a onclick="scrollToSection('charts')">Grafy</a>
+        <a onclick="scrollToSection('scalping')">Predikce pro Scalping</a>
+        <a onclick="scrollToSection('daytrading')">Predikce pro Daytrading</a>
+        <a onclick="scrollToSection('stocks')">Akcie</a>
     </nav>
     <div class="container">
         <div id="charts" class="section">
             <h2>Grafy</h2>
-            <p>Zde budou živé grafy forexu pro měny GBP/USD a USD/EUR.</p>
+            <p>Zde budou živé grafy forexu pro měny GBP/USD, USD/EUR, EUR/JPY.</p>
             <div class="tradingview-widget-container">
                 <div id="tradingview_12345"></div>
                 <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
@@ -112,10 +114,16 @@
                 </script>
             </div>
         </div>
-        <div id="predictions" class="section">
-            <h2>Predikce</h2>
+        <div id="scalping" class="section">
+            <h2>Predikce pro Scalping</h2>
             <div class="alert">
-                <p id="recommendation"><strong>Doporučení:</strong> Načítání dat...</p>
+                <p id="scalping_recommendation"><strong>Doporučení:</strong> Načítání dat...</p>
+            </div>
+        </div>
+        <div id="daytrading" class="section">
+            <h2>Predikce pro Daytrading</h2>
+            <div class="alert">
+                <p id="daytrading_recommendation"><strong>Doporučení:</strong> Načítání dat...</p>
             </div>
         </div>
         <div id="stocks" class="section">
@@ -124,34 +132,15 @@
         </div>
     </div>
     <footer class="footer">
-        <p><a href="https://adas334cz.github.io/forex-trading/" target="_blank">Odkaz na moji stránku</a></p>
+        <p><a href="#" target="_blank">Odkaz na moji stránku</a></p>
     </footer>
     <script>
         const apiKey = 'QRRX5QLI6T3TIMKI';
-        const symbol = 'GBPUSD';
+        const forexSymbols = ['GBPUSD', 'USDEUR', 'EURJPY'];
+        const scalpingSymbol = 'SCALPING';
+        const daytradingSymbol = 'DAYTRADING';
         
-        async function getForexData() {
-            const url = `https://www.alphavantage.co/query?function=CURRENCY_EXCHANGE_RATE&from_currency=GBP&to_currency=USD&apikey=${apiKey}`;
+        async function getForexData(symbol) {
+            const url = `https://www.alphavantage.co/query?function=CURRENCY_EXCHANGE_RATE&from_currency=${symbol.substring(0,3)}&to_currency=${symbol.substring(3)}&apikey=${apiKey}`;
             const response = await fetch(url);
-            const data = await response.json();
-            return data;
-        }
-
-        async function updateRecommendation() {
-            const data = await getForexData();
-            const rate = data['Realtime Currency Exchange Rate']['5. Exchange Rate'];
-            const recommendationElement = document.getElementById('recommendation');
-            const recommendation = `Aktuální kurz GBP/USD je ${rate}. Doporučujeme koupit a držet po dobu 3 dnů.`;
-            recommendationElement.textContent = `Doporučení: ${recommendation}`;
-        }
-
-        updateRecommendation();
-
-        // Přepínání mezi day a night mode
-        const body = document.body;
-        window.toggleNightMode = function() {
-            body.classList.toggle('night-mode');
-        };
-    </script>
-</body>
-</html>
+            const data =
