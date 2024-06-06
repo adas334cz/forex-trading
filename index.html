@@ -143,4 +143,38 @@
         async function getForexData(symbol) {
             const url = `https://www.alphavantage.co/query?function=CURRENCY_EXCHANGE_RATE&from_currency=${symbol.substring(0,3)}&to_currency=${symbol.substring(3)}&apikey=${apiKey}`;
             const response = await fetch(url);
-            const data =
+            const data = await response.json();
+            return data;
+        }
+
+        async function updateRecommendation(symbol) {
+            const data = await getForexData(symbol);
+            const rate = data['Realtime Currency Exchange Rate']['5. Exchange Rate'];
+            let recommendationElement;
+            let recommendation;
+            if (symbol === scalpingSymbol) {
+                recommendationElement = document.getElementById('scalping_recommendation');
+                recommendation = `Aktuální kurz pro Scalping je ${rate}. Doporučujeme koupit a držet po dobu 15 minut.`;
+            } else if (symbol === daytradingSymbol) {
+                recommendationElement = document.getElementById('daytrading_recommendation');
+                recommendation = `Aktuální kurz pro Daytrading je ${rate}. Doporučujeme koupit a držet po dobu 1 hodiny.`;
+            } else {
+                recommendationElement = document.getElementById('daytrading_recommendation');
+                recommendation = `Aktuální kurz ${symbol.substring(0,3)}/${symbol.substring(3)} je ${rate}. Doporučujeme koupit a držet po dobu 3 dnů.`;
+            }
+            recommendationElement.textContent = `Doporučení: ${recommendation}`;
+        }
+
+        // Načtení dat a aktualizace doporučení pro scalping a daytrading
+        updateRecommendation(scalpingSymbol);
+        updateRecommendation(daytradingSymbol);
+        forexSymbols.forEach(symbol => updateRecommendation(symbol));
+
+        // Plynulé posouvání k sekci
+        function scrollToSection(sectionId) {
+            const section = document.getElementById(sectionId);
+            section.scrollIntoView({ behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>
