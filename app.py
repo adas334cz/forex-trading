@@ -4,22 +4,13 @@ import os
 
 app = Flask(__name__)
 
-FINNHUB_API_KEY = os.getenv('FINNHUB_API_KEY')
-ALPHA_VANTAGE_API_KEY = os.getenv('ALPHA_VANTAGE_API_KEY')
+FINNHUB_API_KEY = 'cpgvjspr01qp5iv4vi3gcpgvjspr01qp5iv4vi40'
 
 def fetch_data_from_finnhub(symbol):
     url = f'https://finnhub.io/api/v1/forex/candle?symbol={symbol}&resolution=D&count=90&token={FINNHUB_API_KEY}'
     response = requests.get(url)
     if response.status_code != 200:
         print(f"Error fetching data from Finnhub: {response.status_code}")
-        return None
-    return response.json()
-
-def fetch_data_from_alpha_vantage(symbol):
-    url = f'https://www.alphavantage.co/query?function=FX_DAILY&from_symbol={symbol.split(":")[1]}&to_symbol={symbol.split(":")[0]}&apikey={ALPHA_VANTAGE_API_KEY}'
-    response = requests.get(url)
-    if response.status_code != 200:
-        print(f"Error fetching data from Alpha Vantage: {response.status_code}")
         return None
     return response.json()
 
@@ -43,10 +34,6 @@ def predict(symbol):
     finnhub_data = fetch_data_from_finnhub(symbol)
     if not finnhub_data or 'c' not in finnhub_data:
         return jsonify({"error": "Data fetch error from Finnhub"})
-    
-    alpha_vantage_data = fetch_data_from_alpha_vantage(symbol)
-    if not alpha_vantage_data or 'Time Series FX (Daily)' not in alpha_vantage_data:
-        return jsonify({"error": "Data fetch error from Alpha Vantage"})
 
     analysis = analyze_data(finnhub_data)
     return jsonify(analysis)
