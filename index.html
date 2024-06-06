@@ -1,50 +1,38 @@
 <!DOCTYPE html>
-<html lang="cs">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Forex Trading</title>
-    <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-tickers.js" async>
-    {
-        "symbols": [
-            {
-                "title": "GBP/USD",
-                "proName": "FX:GBPUSD"
-            }
-        ],
-        "colorTheme": "light",
-        "isTransparent": false,
-        "locale": "cs"
-    }
-    </script>
+    <title>Forex Trading Predictions</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
         }
-        header {
+        header, footer {
             background-color: #333;
-            color: #fff;
-            padding: 10px 0;
+            color: white;
             text-align: center;
+            padding: 1em;
         }
-        .currency-selector {
-            text-align: center;
-            margin-top: 20px;
+        main {
+            margin: 20px;
         }
-        .currency-selector button {
-            margin: 5px;
-            padding: 8px 16px;
-            background-color: #333;
-            color: #fff;
-            border: none;
-            cursor: pointer;
-            border-radius: 4px;
+        .widget-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+        }
+        .widget {
+            flex: 1 1 45%;
+            margin: 10px;
         }
         .predictions {
             margin-top: 20px;
-            text-align: center;
+        }
+        .prediction {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-bottom: 10px;
         }
         .sell {
             color: red;
@@ -56,88 +44,70 @@
 </head>
 <body>
     <header>
-        <h1><strong>Forex</strong> Trading</h1>
+        <h1>Forex Trading Predictions</h1>
     </header>
-    <!-- TradingView Widget pro zobrazení interaktivního grafu -->
-    <div class="tradingview-widget-container">
-        <div class="tradingview-widget-container__widget"></div>
-    </div>
-
-    <!-- Tlačítka pro přepínání měnových párů -->
-    <div class="currency-selector">
-        <button onclick="changeSymbol('FX:GBPUSD')">GBP/USD</button>
-        <button onclick="changeSymbol('FX:EURUSD')">EUR/USD</button>
-        <button onclick="changeSymbol('FX:USDJPY')">USD/JPY</button>
-        <!-- Další tlačítka pro další měnové páry -->
-    </div>
-
-    <!-- Predikce -->
-    <div class="predictions" id="predictions">
-        <h2>Predictions</h2>
-    </div>
-
-    <script>
-        // API klíče
-        const apiKeyAlphaVantage = 'QRRX5QLI6T3TIMKI';
-        const apiKeyFinnhub = 'cpgtk4hr01qpm8ao6hr0cpgtk4hr01qpm8ao6hrg';
-
-        // Funkce pro získání finančních dat pomocí API Alpha Vantage
-        async function getFinancialDataAlphaVantage(symbol) {
-            const url = `https://www.alphavantage.co/query?function=TIME_SERIES_MONTHLY&symbol=${symbol}&apikey=${apiKeyAlphaVantage}`;
-            const response = await fetch(url);
-            const data = await response.json();
-            return data;
-        }
-
-        // Funkce pro získání finančních dat pomocí API Finnhub
-        async function getFinancialDataFinnhub(symbol) {
-            const url = `https://finnhub.io/api/v1/stock/metric?symbol=${symbol}&metric=all&token=${apiKeyFinnhub}`;
-            const response = await fetch(url);
-            const data = await response.json();
-            return data;
-        }
-
-        // Funkce pro získání RSI (Relative Strength Index)
-        async function getRSI(symbol) {
-            // Získání RSI z API nebo výpočet na základě historických dat
-            // Zde je pouze zjednodušený příklad
-            const financialData = await getFinancialDataAlphaVantage(symbol);
-            const rsi = calculateRSI(financialData);
-            return rsi;
-        }
-
-        // Funkce pro vyhodnocení strategie scalpingu
-        async function evaluateScalpingStrategy(symbol) {
-            // Zde implementujte strategii scalpingu pomocí dostupných dat
-            // Například analýza cenových pohybů nebo použití technických indikátorů
-            const rsiData = await getRSI(symbol);
-            const currentRSI = rsiData[0]; // Aktuální hodnota RSI
-            const previousRSI = rsiData[1]; // Hodnota RSI v předchozím období
-            const currentPrice = getCurrentPrice(symbol); // Aktuální cena
-            const previousPrice = getPreviousPrice(symbol); // Cena v předchozím období
-
-            let action = ''; // Akce, kterou se má provést (Buy/Sell)
-            let message = ''; // Zpráva s informacemi o obchodu
-
-            // Implementace scalpingové strategie zde
-
-            // Zobrazení obchodního signálu
-            const predictionsElement = document.getElementById('predictions');
-            predictionsElement.innerHTML = `
-                <h2>Scalping Strategy</h2>
-                <p>Action: ${action}</p>
-                <p>${message}</p>
-            `;
-        }
-
-        // Funkce pro změnu měnového páru v TradingView widgetu
-        function changeSymbol(symbol) {
-            var widget = window.tvWidget && window.tvWidget.activeChart();
-            if (widget) {
-                widget.chart().setSymbol(symbol, { interval: 'D' });
-                evaluateScalpingStrategy(symbol);
-            }
-        }
-    </script>
+    <main>
+        <div class="widget-container">
+            <div class="widget">
+                <div id="tradingview_f3d60"></div>
+                <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+                <script type="text/javascript">
+                new TradingView.widget({
+                    "width": "100%",
+                    "height": 400,
+                    "symbol": "FX:EURUSD",
+                    "interval": "D",
+                    "timezone": "Etc/UTC",
+                    "theme": "light",
+                    "style": "1",
+                    "locale": "en",
+                    "toolbar_bg": "#f1f3f6",
+                    "enable_publishing": false,
+                    "hide_side_toolbar": false,
+                    "allow_symbol_change": true,
+                    "container_id": "tradingview_f3d60"
+                });
+                </script>
+            </div>
+            <div class="widget">
+                <div id="tradingview_f3d61"></div>
+                <script type="text/javascript">
+                new TradingView.widget({
+                    "width": "100%",
+                    "height": 400,
+                    "symbol": "FX:USDJPY",
+                    "interval": "D",
+                    "timezone": "Etc/UTC",
+                    "theme": "light",
+                    "style": "1",
+                    "locale": "en",
+                    "toolbar_bg": "#f1f3f6",
+                    "enable_publishing": false,
+                    "hide_side_toolbar": false,
+                    "allow_symbol_change": true,
+                    "container_id": "tradingview_f3d61"
+                });
+                </script>
+            </div>
+        </div>
+        <div class="predictions">
+            <h2>Predictions</h2>
+            <div class="prediction">
+                <h3 class="sell">Sell</h3>
+                <p>Entry: 1.12345</p>
+                <p>Stop Loss: 1.12500</p>
+                <p>Take Profit: 1.12000</p>
+            </div>
+            <div class="prediction">
+                <h3 class="buy">Buy</h3>
+                <p>Entry: 1.12345</p>
+                <p>Stop Loss: 1.12200</p>
+                <p>Take Profit: 1.12600</p>
+            </div>
+        </div>
+    </main>
+    <footer>
+        <p>&copy; 2024 Forex Trading Predictions</p>
+    </footer>
 </body>
 </html>
