@@ -92,22 +92,56 @@
         </div>
         <div class="predictions">
             <h2>Predictions</h2>
-            <div class="prediction">
-                <h3 class="sell">Sell</h3>
-                <p>Entry: 1.12345</p>
-                <p>Stop Loss: 1.12500</p>
-                <p>Take Profit: 1.12000</p>
-            </div>
-            <div class="prediction">
-                <h3 class="buy">Buy</h3>
-                <p>Entry: 1.12345</p>
-                <p>Stop Loss: 1.12200</p>
-                <p>Take Profit: 1.12600</p>
-            </div>
+            <div id="predictions-container"></div>
         </div>
     </main>
     <footer>
         <p>&copy; 2024 Forex Trading Predictions</p>
     </footer>
+    <script>
+        async function fetchPredictions(symbol) {
+            try {
+                const response = await fetch(`https://your-app-name.onrender.com/predict/${symbol}`);
+                const data = await response.json();
+                displayPredictions(data);
+            } catch (error) {
+                console.error('Error fetching predictions:', error);
+            }
+        }
+
+        function displayPredictions(predictions) {
+            const container = document.getElementById('predictions-container');
+            container.innerHTML = '';
+
+            if (predictions.error) {
+                container.innerHTML = `<p>${predictions.error}</p>`;
+                return;
+            }
+
+            const sellPrediction = document.createElement('div');
+            sellPrediction.classList.add('prediction', 'sell');
+            sellPrediction.innerHTML = `
+                <h3>Sell</h3>
+                <p>Entry: ${predictions.sell.entry}</p>
+                <p>Stop Loss: ${predictions.sell.stop_loss}</p>
+                <p>Take Profit: ${predictions.sell.take_profit}</p>
+            `;
+
+            const buyPrediction = document.createElement('div');
+            buyPrediction.classList.add('prediction', 'buy');
+            buyPrediction.innerHTML = `
+                <h3>Buy</h3>
+                <p>Entry: ${predictions.buy.entry}</p>
+                <p>Stop Loss: ${predictions.buy.stop_loss}</p>
+                <p>Take Profit: ${predictions.buy.take_profit}</p>
+            `;
+
+            container.appendChild(sellPrediction);
+            container.appendChild(buyPrediction);
+        }
+
+        // Fetch predictions for a default symbol
+        fetchPredictions('OANDA:EUR_USD');
+    </script>
 </body>
 </html>
