@@ -1,4 +1,4 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="cs">
 <head>
     <meta charset="UTF-8">
@@ -52,6 +52,23 @@
             margin-bottom: 15px;
             padding: 15px;
         }
+        .tradingview-widget-container {
+            width: 100%;
+            height: 600px;
+        }
+        .footer {
+            text-align: center;
+            padding: 20px;
+            background-color: #333;
+            color: #fff;
+        }
+        .footer a {
+            color: #fff;
+            text-decoration: none;
+        }
+        .footer a:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
@@ -71,22 +88,22 @@
                 <div id="tradingview_12345"></div>
                 <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
                 <script type="text/javascript">
-                new TradingView.widget(
-                {
-                    "width": 980,
-                    "height": 610,
-                    "symbol": "FX:GBPUSD",
-                    "interval": "D",
-                    "timezone": "Etc/UTC",
-                    "theme": "light",
-                    "style": "1",
-                    "locale": "cs",
-                    "toolbar_bg": "#f1f3f6",
-                    "enable_publishing": false,
-                    "allow_symbol_change": true,
-                    "container_id": "tradingview_12345"
-                }
-                );
+                    new TradingView.widget(
+                    {
+                        "width": 980,
+                        "height": 600,
+                        "symbol": "FX:GBPUSD",
+                        "interval": "D",
+                        "timezone": "Etc/UTC",
+                        "theme": "light",
+                        "style": "1",
+                        "locale": "cs",
+                        "toolbar_bg": "#f1f3f6",
+                        "enable_publishing": false,
+                        "allow_symbol_change": true,
+                        "container_id": "tradingview_12345"
+                    }
+                    );
                 </script>
             </div>
         </div>
@@ -99,9 +116,11 @@
         <div id="stocks" class="section">
             <h2>Akcie</h2>
             <p>Zde budou informace o akciích jako Tesla, GameStop, Nvidia.</p>
-            <!-- Místo pro akcie -->
         </div>
     </div>
+    <footer class="footer">
+        <p><a href="https://adas334cz.github.io/forex-trading/" target="_blank">Odkaz na moji stránku</a></p>
+    </footer>
     <script>
         const apiKey = '3D7G4UEDZH3ZVT7X';
         const symbol = 'GBPUSD';
