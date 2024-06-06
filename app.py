@@ -1,10 +1,11 @@
 from flask import Flask, jsonify
 import requests
+import os
 
 app = Flask(__name__)
 
-FINNHUB_API_KEY = 'cpgtk4hr01qpm8ao6hr0cpgtk4hr01qpm8ao6hrg'
-ALPHA_VANTAGE_API_KEY = 'QRRX5QLI6T3TIMKI'
+FINNHUB_API_KEY = os.getenv('FINNHUB_API_KEY')
+ALPHA_VANTAGE_API_KEY = os.getenv('ALPHA_VANTAGE_API_KEY')
 
 def fetch_data_from_finnhub(symbol):
     url = f'https://finnhub.io/api/v1/forex/candle?symbol={symbol}&resolution=D&count=90&token={FINNHUB_API_KEY}'
@@ -44,4 +45,4 @@ def predict(symbol):
     return jsonify(analysis)
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=5000)
