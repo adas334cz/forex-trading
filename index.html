@@ -12,6 +12,11 @@
             margin: 0;
             padding: 0;
             background-color: #f4f4f4;
+            color: #333; /* Černá barva pro text v normálním režimu */
+        }
+        body.night-mode {
+            background-color: #222; /* Černé pozadí pro night režim */
+            color: #fff; /* Bílá barva pro text v night režimu */
         }
         header {
             background-color: #333;
@@ -122,7 +127,7 @@
         <p><a href="https://adas334cz.github.io/forex-trading/" target="_blank">Odkaz na moji stránku</a></p>
     </footer>
     <script>
-        const apiKey = '3D7G4UEDZH3ZVT7X';
+        const apiKey = 'QRRX5QLI6T3TIMKI';
         const symbol = 'GBPUSD';
         
         async function getForexData() {
@@ -141,6 +146,12 @@
         }
 
         updateRecommendation();
+
+        // Přepínání mezi day a night mode
+        const body = document.body;
+        window.toggleNightMode = function() {
+            body.classList.toggle('night-mode');
+        };
     </script>
 </body>
 </html>
